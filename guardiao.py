@@ -9,11 +9,20 @@ import threading
 import tkinter as tk
 from tkinter import messagebox, simpledialog
 
-APP_DIR = os.path.dirname(os.path.abspath(__file__))
-CONFIG_PATH = os.path.join(APP_DIR, "config.json")
-LOG_PATH = os.path.join(APP_DIR, "guardiao.log")
-MONITOR_PATH = os.path.join(APP_DIR, "monitor.ps1")
-ICON_PATH = os.path.join(APP_DIR, "guardiao.ico")
+if getattr(sys, "frozen", False):
+    RESOURCE_DIR = getattr(sys, "_MEIPASS", os.path.dirname(sys.executable))
+    PERSIST_DIR = os.path.dirname(sys.executable)
+else:
+    RESOURCE_DIR = os.path.dirname(os.path.abspath(__file__))
+    PERSIST_DIR = RESOURCE_DIR
+
+APP_DIR = PERSIST_DIR
+CONFIG_PATH = os.path.join(PERSIST_DIR, "config.json")
+LOG_PATH = os.path.join(PERSIST_DIR, "guardiao.log")
+MONITOR_PATH = os.path.join(RESOURCE_DIR, "monitor.ps1")
+ICON_PATH = os.path.join(RESOURCE_DIR, "guardiao.ico")
+ATIVAR_PATH = os.path.join(RESOURCE_DIR, "ativar_bloqueio.ps1")
+DESATIVAR_PATH = os.path.join(RESOURCE_DIR, "desativar_bloqueio.ps1")
 HOSTS_PATH = os.path.join(os.environ.get("WINDIR", r"C:\Windows"), "System32", "drivers", "etc", "hosts")
 MARKER_INI = "# === GUARDIAO ANTI-RIOT ==="
 LOCK_HOST = "127.0.0.1"
@@ -183,7 +192,8 @@ class App:
             return
         try:
             self.monitor_proc = subprocess.Popen(
-                ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", MONITOR_PATH],
+                ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", MONITOR_PATH,
+                 "-LogPath", LOG_PATH, "-ConfigPath", CONFIG_PATH],
                 creationflags=CREATE_NO_WINDOW,
             )
             log("monitor iniciado pelo app")
@@ -280,14 +290,14 @@ class App:
                     "Desativar o bloqueio de rede da Riot?\nIsso vai liberar o jogo novamente.",
                     parent=self.root):
                 return
-            rodar_elevado(os.path.join(APP_DIR, "desativar_bloqueio.ps1"))
+            rodar_elevado(DESATIVAR_PATH)
         else:
             if not messagebox.askyesno("Ativar bloqueio",
                     "Vai abrir o pedido de administrador (UAC). Clique em Sim.\n"
                     "Isso bloqueia os servidores da Riot (o jogo fica inutilizável).",
                     parent=self.root):
                 return
-            rodar_elevado(os.path.join(APP_DIR, "ativar_bloqueio.ps1"))
+            rodar_elevado(ATIVAR_PATH)
         self.root.after(6000, self.atualizar_tudo)
 
     def alternar_escudo(self):

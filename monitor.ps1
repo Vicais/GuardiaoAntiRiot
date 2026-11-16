@@ -1,7 +1,13 @@
+param(
+    [string]$LogPath,
+    [string]$ConfigPath
+)
 $ErrorActionPreference = "SilentlyContinue"
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$logPath = Join-Path $scriptDir "guardiao.log"
-$configPath = Join-Path $scriptDir "config.json"
+if (-not $LogPath) { $LogPath = Join-Path $scriptDir "guardiao.log" }
+if (-not $ConfigPath) { $ConfigPath = Join-Path $scriptDir "config.json" }
+$logPath = $LogPath
+$configPath = $ConfigPath
 $port = 51337
 
 $fileActionText = @'

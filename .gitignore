@@ -9,3 +9,8 @@ out.txt
 # Python
 __pycache__/
 *.pyc
+
+# Build do PyInstaller
+dist/
+build/
+*.spec
