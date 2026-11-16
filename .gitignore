@@ -1,0 +1,11 @@
+# Estado local do app (não versionar)
+config.json
+guardiao.log
+
+# Temporários
+err.txt
+out.txt
+
+# Python
+__pycache__/
+*.pyc
